@@ -12,7 +12,6 @@ import androidx.annotation.RequiresApi;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class JobService extends android.app.job.JobService {
-    private static final String RESTART_INTENT = "com.example.msapproekt.restart";
     private static String TAG= JobService.class.getSimpleName();
     private static RestartServiceBroadcastReceiver restartSensorServiceReceiver;
     private static JobService instance;
@@ -24,7 +23,7 @@ public class JobService extends android.app.job.JobService {
         bck.launchService(this);
         registerRestarterReceiver();
         instance= this;
-        JobService.jobParameters = jobParameters;
+        JobService.jobParameters= jobParameters;
 
         return false;
     }
@@ -49,7 +48,7 @@ public class JobService extends android.app.job.JobService {
                 // we register the  receiver that will restart the background service if it is killed
                 // see onDestroy of Service
                 IntentFilter filter = new IntentFilter();
-                filter.addAction(RESTART_INTENT);
+                filter.addAction(Globals.RESTART_INTENT);
                 try {
                     registerReceiver(restartSensorServiceReceiver, filter);
                 } catch (Exception e) {
@@ -72,7 +71,7 @@ public class JobService extends android.app.job.JobService {
     @Override
     public boolean onStopJob(JobParameters jobParameters) {
         Log.i(TAG, "Stopping job");
-        Intent broadcastIntent = new Intent(RESTART_INTENT);
+        Intent broadcastIntent = new Intent(Globals.RESTART_INTENT);
         sendBroadcast(broadcastIntent);
         // give the time to run
         new Handler().postDelayed(new Runnable() {

@@ -11,25 +11,20 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       // setContentView(R.layout.activity_main);
-        finish();
+        //setContentView(R.layout.activity_main);
+        //finish(); <--- greshen izbor nema da se izvrshi zakazuvanjeto
     }
 
-
-    /** Dokolku verzijata na android e lollipop ili ponova da se odi preku logika na jobscheduler za high
-     * priority a dokolku e poniska da se odi preku klasichen pristam so service
-     */
     @Override
     protected void onResume() {
         super.onResume();
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             RestartServiceBroadcastReceiver.scheduleJob(getApplicationContext());
-        }
-        else
-        {
+        } else {
             ProcessMainClass bck = new ProcessMainClass();
             bck.launchService(getApplicationContext());
         }
-        finish();
+        //finish(); <-- nema da prodolzi brojachot otkako kje se zatvori app
     }
+
 }

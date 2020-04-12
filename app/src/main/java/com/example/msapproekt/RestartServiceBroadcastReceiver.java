@@ -14,12 +14,13 @@ import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
+import java.util.Objects;
+
 import static android.content.Context.JOB_SCHEDULER_SERVICE;
 
 public class RestartServiceBroadcastReceiver extends BroadcastReceiver {
 
     public static final String TAG = RestartServiceBroadcastReceiver.class.getSimpleName();
-    private static final String RESTART_INTENT = "com.example.msapproekt.restart";
     private static JobScheduler jobScheduler;
     private RestartServiceBroadcastReceiver restartSensorServiceReceiver;
 
@@ -76,7 +77,7 @@ public class RestartServiceBroadcastReceiver extends BroadcastReceiver {
     public static void reStartTracker(Context context) {
         // restart the never ending service
         Log.i(TAG, "Restarting tracker");
-        Intent broadcastIntent = new Intent(RESTART_INTENT);
+        Intent broadcastIntent = new Intent(Globals.RESTART_INTENT);
         context.sendBroadcast(broadcastIntent);
     }
 
@@ -101,7 +102,7 @@ public class RestartServiceBroadcastReceiver extends BroadcastReceiver {
                 // we register the  receiver that will restart the background service if it is killed
                 // see onDestroy of Service
                 IntentFilter filter = new IntentFilter();
-                filter.addAction(RESTART_INTENT);
+                filter.addAction(Globals.RESTART_INTENT);
                 try {
                     context.registerReceiver(restartSensorServiceReceiver, filter);
                 } catch (Exception e) {

@@ -13,15 +13,12 @@ import java.util.TimerTask;
 public class Service extends android.app.Service {
 
     protected static final int NOTIFICATION_ID = 1337;
-    private static final String RESTART_INTENT = "com.example.msapproekt.restart";
-
-    private static  Service mCurrentService=null;
-
-    private static final String TAG = Service.class.getSimpleName();
-    public int counter=0;
+    private static String TAG = "Service";
+    private static Service mCurrentService;
+    private int counter = 0;
 
     public Service() {
-
+        super();
     }
 
 
@@ -33,11 +30,6 @@ public class Service extends android.app.Service {
         }
         mCurrentService = this;
     }
-
-    public static void setmCurrentService(Service mCurrentService) {
-        Service.mCurrentService = mCurrentService;
-    }
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -63,15 +55,22 @@ public class Service extends android.app.Service {
         return START_STICKY;
     }
 
+
+    @Nullable
     @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        super.onTaskRemoved(rootIntent);
-        Log.i(TAG, "onTaskRemoved called");
-        // restart the never ending service
-        Intent broadcastIntent = new Intent(RESTART_INTENT);
-        sendBroadcast(broadcastIntent);
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
+
+    /**
+     * it starts the process in foreground. Normally this is done when screen goes off
+     * THIS IS REQUIRED IN ANDROID 8 :
+     * "The system allows apps to call Context.startForegroundService()
+     * even while the app is in the background.
+     * However, the app must call that service's startForeground() method within five seconds
+     * after the service is created."
+     */
     public void restartForeground() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Log.i(TAG, "restarting foreground");
@@ -86,6 +85,41 @@ public class Service extends android.app.Service {
         }
     }
 
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.i(TAG, "onDestroy called");
+        // restart the never ending service
+        Intent broadcastIntent = new Intent(Globals.RESTART_INTENT);
+        sendBroadcast(broadcastIntent);
+        stoptimertask();
+    }
+
+
+    /**
+     * this is called when the process is killed by Android
+     *
+     * @param rootIntent
+     */
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        Log.i(TAG, "onTaskRemoved called");
+        // restart the never ending service
+        Intent broadcastIntent = new Intent(Globals.RESTART_INTENT);
+        sendBroadcast(broadcastIntent);
+        // do not call stoptimertask because on some phones it is called asynchronously
+        // after you swipe out the app and therefore sometimes
+        // it will stop the timer after it was restarted
+        // stoptimertask();
+    }
+
+
+    /**
+     * static to avoid multiple timers to be created when the service is called several times
+     */
     private static Timer timer;
     private static TimerTask timerTask;
     long oldTime = 0;
@@ -105,14 +139,9 @@ public class Service extends android.app.Service {
         timer.schedule(timerTask, 1000, 1000); //
     }
 
-    public void stoptimertask() {
-        //stop the timer, if it's not already null
-        if (timer != null) {
-            timer.cancel();
-            timer = null;
-        }
-    }
-
+    /**
+     * it sets the timer to print the counter every x seconds
+     */
     public void initializeTimerTask() {
         Log.i(TAG, "initialising TimerTask");
         timerTask = new TimerTask() {
@@ -122,21 +151,25 @@ public class Service extends android.app.Service {
         };
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.i(TAG, "onDestroy called");
-        // restart the never ending service
-        Intent broadcastIntent = new Intent(RESTART_INTENT);
-        sendBroadcast(broadcastIntent);
-        stoptimertask();
+    /**
+     * not needed
+     */
+    public void stoptimertask() {
+        //stop the timer, if it's not already null
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
     }
 
-    /** ova ne go chepkaj **/
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    public static Service getmCurrentService() {
+        return mCurrentService;
     }
+
+    public static void setmCurrentService(Service mCurrentService) {
+        Service.mCurrentService = mCurrentService;
+    }
+
+
 }
 

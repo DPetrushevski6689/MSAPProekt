@@ -6,23 +6,30 @@ import android.os.Build;
 import android.util.Log;
 
 public class ProcessMainClass {
-    public static final String TAG = ProcessMainClass.class.getSimpleName(); //tag za logovi
+    public static final String TAG = ProcessMainClass.class.getSimpleName();
+    private static Intent serviceIntent = null;
 
-    public static Intent serviceIntent = null;
-
-    public ProcessMainClass() { //konstruktor
+    public ProcessMainClass() {
     }
 
+
+    private void setServiceIntent(Context context) {
+        if (serviceIntent == null) {
+            serviceIntent = new Intent(context, Service.class);
+        }
+    }
+    /**
+     * launching the service
+     */
     public void launchService(Context context) {
         if (context == null) {
             return;
         }
-        serviceIntent = new Intent(context,Service.class); //intent so koj se pokreva servisot (klasichen pristap)
-
+        setServiceIntent(context);
         // depending on the version of Android we eitehr launch the simple service (version<O)
         // or we start a foreground service
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(serviceIntent); //ova e radi restrikcii za novi verzii za android
+            context.startForegroundService(serviceIntent);
         } else {
             context.startService(serviceIntent);
         }
