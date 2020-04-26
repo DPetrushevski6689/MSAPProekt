@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 import java.io.PipedInputStream;
+import java.sql.Time;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -22,6 +23,7 @@ public class Service extends android.app.Service {
     private static String TAG = "Service";
     private static Service mCurrentService;
     private int counter = 0;
+    private TimerTask timertask;
 
     public Service() {
         super();
@@ -69,7 +71,8 @@ public class Service extends android.app.Service {
             if(networkInfo != null && networkInfo.isConnected())
             {
                 /** ovdeka da se povika asynctask **/
-                new PingBackend().execute(); //<------------- asynctaskot za ping
+                //new PingBackend().execute(); //<------------- asynctaskot za ping
+                startAsync();
             }
             else
             {
@@ -81,6 +84,22 @@ public class Service extends android.app.Service {
 
         // return start sticky so if it is killed by android, it will be restarted with Intent null
         return START_STICKY;
+    }
+
+    public void startAsync(){
+        Timer timer = new Timer();
+        initializeTimerTask();
+
+        timer.schedule(timertask,1000,600000);
+    }
+
+    public void initializeTimerTask() {
+        timertask = new TimerTask() {
+            @Override
+            public void run() {
+                new PingBackend().execute();
+            }
+        };
     }
 
 
@@ -121,7 +140,8 @@ public class Service extends android.app.Service {
         // restart the never ending service
         Intent broadcastIntent = new Intent(Globals.RESTART_INTENT);
         sendBroadcast(broadcastIntent);
-        new PingBackend().cancel(true); /** OVA DA SE PROVERI !!! **/
+        new PingBackend().execute();
+        //new PingBackend().cancel(true); /** OVA DA SE PROVERI !!! **/
     }
 
 
