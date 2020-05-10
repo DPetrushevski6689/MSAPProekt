@@ -27,11 +27,11 @@ public class NetworkUtils {
         String JSONString = null;
         try{
 
-            Uri builtUri = Uri.parse("http://10.0.2.2:5000/getJobs")
+            Uri builtUri = Uri.parse("http://10.0.2.2:5000/getjobs/emulator")
                     .buildUpon()
                     .build();
 
-            Log.d(LOG_TAG,"Se konektira do http://10.0.2.2:5000/getJobs");
+            Log.d(LOG_TAG,"Se konektira do http://10.0.2.2:5000/getjobs/emulator"); //<-- promena na url za emulator
 
             URL requestUrl = new URL(builtUri.toString());
             urlConnection = (HttpURLConnection) requestUrl.openConnection(); // <-- otvorena konekcija

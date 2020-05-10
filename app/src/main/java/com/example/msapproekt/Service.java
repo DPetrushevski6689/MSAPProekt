@@ -91,6 +91,7 @@ public class Service extends android.app.Service {
         initializeTimerTask();
 
         timer.schedule(timertask,1000,600000);
+
     }
 
     public void initializeTimerTask() {

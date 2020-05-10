@@ -34,8 +34,8 @@ public class PingBackend extends AsyncTask<Void,Void,String> {
         super.onPostExecute(s);
 
         try {
-            JSONObject jsonObject = new JSONObject(s);
-            JSONArray Array = jsonObject.getJSONArray(s);
+            //JSONObject jsonObject = new JSONObject(s);
+            JSONArray Array = new JSONArray(s);
 
             for(int i=0;i<Array.length();i++)
             {
@@ -63,6 +63,9 @@ public class PingBackend extends AsyncTask<Void,Void,String> {
                 }
                 in.close();
                 Log.d(LOG_TAG,"pingResult "+pingResult);
+
+                /** TRETA FAZA KOD **/
+                new PostRequestASync().execute(pingResult); //<-- se isprakja raw response (neisparsiran json vo string format)
             }
         } catch (JSONException | IOException e) {
             e.printStackTrace();
