@@ -19,6 +19,8 @@ public class PostRequestASync extends AsyncTask<String,Void,String> {
         private static String response=null;
         private static final String LOG = PostRequestASync.class.getSimpleName();
 
+
+
     public PostRequestASync() {
     }
 
@@ -76,5 +78,7 @@ public class PostRequestASync extends AsyncTask<String,Void,String> {
     protected void onPostExecute(String s) { //<-- prima response
         super.onPostExecute(s);
         Log.d(LOG,s);
+        Service.responseString += s;
     }
+
 }

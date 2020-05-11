@@ -27,4 +27,5 @@ public class MainActivity extends Activity {
         //finish(); <-- nema da prodolzi brojachot otkako kje se zatvori app
     }
 
+
 }

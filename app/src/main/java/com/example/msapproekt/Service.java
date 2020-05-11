@@ -3,6 +3,7 @@ package com.example.msapproekt;
 import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
@@ -25,6 +26,16 @@ public class Service extends android.app.Service {
     private int counter = 0;
     private TimerTask timertask;
 
+    private SharedPreferences mPreferences; //SharedPreferences objekjt
+    private String sharedPrefFile = "com.example.msapproekt"; //ime na fajlot vo koj kje zachuvam
+    private String RESPONSE_KEY="response";
+    public static String responseString=""; //response string od post akcija
+    private int count=0;
+
+    public static String pingResult=null; //result string od ping akcija
+
+    //public static String pingResult = PingBackend.pingResult;
+
     public Service() {
         super();
     }
@@ -33,10 +44,16 @@ public class Service extends android.app.Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             restartForeground();
         }
         mCurrentService = this;
+
+        mPreferences = getSharedPreferences(sharedPrefFile,MODE_PRIVATE);
+
+        responseString = mPreferences.getString(RESPONSE_KEY,"");
+
     }
 
     /** OVDEKA DA SE IZVRSHUVA ZADACHATA !!!**/
@@ -44,10 +61,23 @@ public class Service extends android.app.Service {
     /** MI TREBA ASYNCTASK ZA WORKER THREAD **/
 
 
+    public String dependString()
+    {
+        if(responseString=="")
+        {
+            return pingResult;
+        }
+        else{
+            return responseString;
+        }
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         Log.d(TAG, "restarting Service !!");
+
+
 
 
         // it has been killed by Android and now it is restarted. We must make sure to have reinitialised everything
@@ -77,6 +107,14 @@ public class Service extends android.app.Service {
             else
             {
                 Toast.makeText(this,"No connection",Toast.LENGTH_SHORT).show();
+                count++;
+                if(count<=3)
+                {
+                    for(int i=0; i<count; i++)
+                    {
+                        saveResponse();
+                    }
+                }
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -89,18 +127,26 @@ public class Service extends android.app.Service {
     public void startAsync(){
         Timer timer = new Timer();
         initializeTimerTask();
-
-        timer.schedule(timertask,1000,600000);
-
+        timer.schedule(timertask,1000,6000); /** periodot go namaliv so cel da testiram **/
     }
 
     public void initializeTimerTask() {
+
         timertask = new TimerTask() {
             @Override
             public void run() {
+
                 new PingBackend().execute();
+                new PostRequestASync().execute(dependString()); //ovde mi treba pingresult
             }
         };
+    }
+
+    public void saveResponse(){
+        SharedPreferences.Editor preferencesEditor = mPreferences.edit();
+        preferencesEditor.putString(RESPONSE_KEY,responseString);
+        preferencesEditor.apply();
+
     }
 
 
@@ -177,7 +223,6 @@ public class Service extends android.app.Service {
     public static void setmCurrentService(Service mCurrentService) {
         Service.mCurrentService = mCurrentService;
     }
-
 
 }
 

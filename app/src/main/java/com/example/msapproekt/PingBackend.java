@@ -15,6 +15,8 @@ public class PingBackend extends AsyncTask<Void,Void,String> {
 
     private static final String LOG_TAG=PingBackend.class.getSimpleName();
 
+    private static String depend;
+
     public PingBackend() {
 
     }
@@ -63,9 +65,7 @@ public class PingBackend extends AsyncTask<Void,Void,String> {
                 }
                 in.close();
                 Log.d(LOG_TAG,"pingResult "+pingResult);
-
-                /** TRETA FAZA KOD **/
-                new PostRequestASync().execute(pingResult); //<-- se isprakja raw response (neisparsiran json vo string format)
+                Service.pingResult = pingResult;
             }
         } catch (JSONException | IOException e) {
             e.printStackTrace();
